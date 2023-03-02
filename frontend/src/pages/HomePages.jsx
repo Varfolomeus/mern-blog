@@ -8,27 +8,35 @@ import styles from './HomeBlock.module.scss';
 import { Post } from '../components/Post';
 import { TagsBlock } from '../components/TagsBlock';
 import { CommentsBlock } from '../components/CommentsBlock';
-import { fetchPosts, fetchPostsOnTags, fetchSortByCreation, fetchSortByViews, fetchTags } from '../redux/slices/posts';
+import { fetchPage, fetchPostsOnTags, fetchTags } from '../redux/slices/posts';
 import { fetchComments } from '../redux/slices/comments';
 import { placeFilter } from '../redux/slices/filter';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-export const Home = ({ filterTagvalue, setFilterTagvalue, tabsValue, setTabsValue }) => {
-  const navigate = useNavigate();
+export const HomePages = ({ filterTagvalue, setFilterTagvalue, tabsValue, setTabsValue }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [usedQuery] = useSearchParams();
+  const usedPage = +usedQuery.get('page');
+
+  // console.log(usedQuery.get('page'), usedQuery.get('pagesize'));
+  // const usedPage = useSelector((state) => state.auth.data.page);
   const userData = useSelector((state) => state.auth.data);
   const { posts, tags } = useSelector((state) => state.posts);
   const pageSize = posts.pageSize;
+  const postCount = posts.count;
+
   const { comments } = useSelector((state) => state.comments);
   const filterByTagName = useSelector((state) => state.filter.filter.value);
 
   React.useEffect(() => {
-    dispatch(fetchPosts());
+    dispatch(fetchPage({ page: usedPage, pageSize }));
+    dispatch(placeFilter(''));
     dispatch(fetchTags());
     dispatch(fetchComments());
-  }, []);
+  }, [usedPage]);
 
   React.useEffect(() => {
     if (filterByTagName) {
@@ -41,7 +49,6 @@ export const Home = ({ filterTagvalue, setFilterTagvalue, tabsValue, setTabsValu
   const isPostsLoading = posts.status === 'loading';
   const isTagsLoading = tags.status === 'loading';
   const isCommentsLoading = comments.status === 'loading';
-  // console.log('filtertagValue', filtertagValue);
 
   return (
     <>
@@ -50,21 +57,22 @@ export const Home = ({ filterTagvalue, setFilterTagvalue, tabsValue, setTabsValu
         <Typography variant="h6" classes={{ root: styles.title }}>
           <Tabs style={{ marginBottom: 15 }} value={tabsValue} aria-label="basic tabs example">
             <Tab
-              label="New"
+              disabled={Boolean(usedPage === 1)}
+              label="Previous"
               onClick={() => {
                 setTabsValue(0);
-                setFilterTagvalue('');
                 dispatch(placeFilter(''));
-                dispatch(fetchSortByCreation());
-                navigate(`/pages?page=1&pagesize=${pageSize}`);
+                navigate(`/pages?page=${usedPage - 1}&pagesize=${pageSize}`);
               }}
             />
             <Tab
-              label="Popular"
+              label="Next"
+              disabled={Boolean(usedPage * pageSize > postCount)}
               onClick={() => {
                 setTabsValue(1);
                 setFilterTagvalue('');
-                dispatch(fetchSortByViews());
+                // dispatch(fetchSortByViews());
+                navigate(`/pages?page=${usedPage + 1}&pagesize=${pageSize}`);
               }}
             />
           </Tabs>

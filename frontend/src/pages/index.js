@@ -1,4 +1,5 @@
 export { Home } from "./Home";
+export { HomePages } from "./HomePages";
 export { FullPost } from "./FullPost";
 export { AddPost } from "./AddPost";
 export { Registration } from "./Registration";

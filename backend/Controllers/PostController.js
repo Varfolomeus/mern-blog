@@ -4,10 +4,7 @@ import PostModel from './../models/Post.js';
 export const getLastTags = async (req, res) => {
   try {
     const posts = await PostModel.find().limit(5).exec();
-    const tags = Array.from(new Set(posts.map((obj) => obj.tags).flat())).slice(
-      0,
-      5
-    );
+    const tags = Array.from(new Set(posts.map((obj) => obj.tags).flat())).slice(0, 5);
     res.json(tags);
   } catch (err) {
     console.log(err);
@@ -47,6 +44,45 @@ export const getAll = async (req, res) => {
     });
   }
 };
+export const getPage = async (req, res) => {
+  // console.log(req.query);
+  const pageNumber = +req.query.page;
+  const pageSize = +req.query.pagesize;
+  try {
+    const postCount = await PostModel.find().count();
+    //  console.log(postCount);
+
+    const posts = await PostModel.aggregate([
+      { $sort: { createdAt: -1 } },
+      {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'post',
+          as: 'comments',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'user_author',
+        },
+      },
+    ])
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+      .exec();
+   const data = { posts, count: postCount };
+    res.json(data);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Posts not found',
+    });
+  }
+};
 export const getSortedByCreation = async (req, res) => {
   try {
     const posts = await PostModel.aggregate([
@@ -67,7 +103,7 @@ export const getSortedByCreation = async (req, res) => {
           as: 'user_author',
         },
       },
-    ]).exec();
+    ]).skipexec();
 
     res.json(posts);
   } catch (err) {
@@ -159,7 +195,7 @@ export const getOne = async (req, res) => {
       const postId = mongo.ObjectId(req.params.id);
       // console.log('req.params.id', req.params.id);
 
-       PostModel.updateOne(
+      PostModel.updateOne(
         {
           _id: postId1,
         },

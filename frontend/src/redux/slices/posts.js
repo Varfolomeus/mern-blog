@@ -10,45 +10,37 @@ export const fetchTags = createAsyncThunk('posts/fetchTags', async () => {
   const { data } = await axios.get('/tags');
   return data;
 });
-export const fetchPostOnId = createAsyncThunk(
-  'posts/fetchOnePost',
-  async (id) => {
-    console.log('tags', id);
-    const { data } = await axios.get(`/posts/${id}`);
-    return data;
-  }
-);
-export const fetchPostsOnTags = createAsyncThunk(
-  'posts/fetchPostsOnTags',
-  async (id) => {
-    // console.log('Hello tag filter',id);
-    const { data } = await axios.get(`/tags/${id}`);
-    return data;
-  }
-);
-export const fetchSortByCreation = createAsyncThunk(
-  'posts/fetchSortByCreation',
-  async () => {
-    const { data } = await axios.get('/postssortbycreation');
-    return data;
-  }
-);
-export const fetchSortByViews = createAsyncThunk(
-  'posts/fetchSortByViews',
-  async () => {
-    const { data } = await axios.get('/postssortbyviews');
-    return data;
-  }
-);
-export const fetchRemovePost = createAsyncThunk(
-  'posts/fetchRemovePost',
-  async (id) => {
-    await axios.delete(`/posts/${id}`);
-  }
-);
+export const fetchPage = createAsyncThunk('posts/fetchPage', async ({ page, pageSize }) => {
+  const { data } = await axios.get(`/pages?page=${page}&pagesize=${pageSize}`);
+  console.log("data", data);
+  return data;
+});
+export const fetchPostOnId = createAsyncThunk('posts/fetchOnePost', async (id) => {
+  const { data } = await axios.get(`/posts/${id}`);
+  return data;
+});
+export const fetchPostsOnTags = createAsyncThunk('posts/fetchPostsOnTags', async (id) => {
+  // console.log('Hello tag filter',id);
+  const { data } = await axios.get(`/tags/${id}`);
+  return data;
+});
+export const fetchSortByCreation = createAsyncThunk('posts/fetchSortByCreation', async () => {
+  const { data } = await axios.get('/postssortbycreation');
+  return data;
+});
+export const fetchSortByViews = createAsyncThunk('posts/fetchSortByViews', async () => {
+  const { data } = await axios.get('/postssortbyviews');
+  return data;
+});
+export const fetchRemovePost = createAsyncThunk('posts/fetchRemovePost', async (id) => {
+  await axios.delete(`/posts/${id}`);
+});
 const initialState = {
   posts: {
     items: [],
+    pageSize: 3,
+    count:null,
+    pageNumber: null,
     status: 'loading',
   },
   tags: {
@@ -82,6 +74,19 @@ const postsSlice = createSlice({
       state.posts.status = 'loaded';
     },
     [fetchPosts.rejected]: (state) => {
+      state.posts.items = [];
+      state.posts.status = 'error';
+    },
+    [fetchPage.pending]: (state) => {
+      state.posts.items = [];
+      state.posts.status = 'loading';
+    },
+    [fetchPage.fulfilled]: (state, action) => {
+      state.posts.items = action.payload.posts;
+      state.posts.count = action.payload.count;
+      state.posts.status = 'loaded';
+    },
+    [fetchPage.rejected]: (state) => {
       state.posts.items = [];
       state.posts.status = 'error';
     },
@@ -136,9 +141,7 @@ const postsSlice = createSlice({
     },
     //remove article
     [fetchRemovePost.pending]: (state, action) => {
-      state.posts.items = state.posts.items.filter(
-        (obj) => obj._id !== action.meta.arg
-      );
+      state.posts.items = state.posts.items.filter((obj) => obj._id !== action.meta.arg);
       state.tags.status = 'loading';
     },
     [fetchRemovePost.rejected]: (state) => {

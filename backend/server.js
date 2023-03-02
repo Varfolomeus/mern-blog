@@ -71,6 +71,7 @@ app.post('/avatar', uploadforavatars.single('image'), (req, res) => {
 });
 
 app.get('/posts', PostController.getAll);
+app.get('/pages', PostController.getPage);
 app.get('/tags', PostController.getLastTags);
 app.get('/tags/:id', PostController.getPostOnTags);
 app.get('/posts/:id', PostController.getOne);
