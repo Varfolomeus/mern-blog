@@ -24,16 +24,15 @@ export const Home = ({ filterTagvalue, setFilterTagvalue, tabsValue, setTabsValu
   const { comments } = useSelector((state) => state.comments);
   const filterByTagName = useSelector((state) => state.filter.filter.value);
 
-  React.useEffect(() => {
-    dispatch(fetchPosts());
-    dispatch(fetchTags());
-    dispatch(fetchComments());
-  }, []);
 
   React.useEffect(() => {
     if (filterByTagName) {
       dispatch(fetchPostsOnTags(filterByTagName));
       setFilterTagvalue(filterByTagName);
+    }else{
+      dispatch(fetchPosts());
+      dispatch(fetchTags());
+      dispatch(fetchComments());
     }
   }, [filterByTagName]);
 
