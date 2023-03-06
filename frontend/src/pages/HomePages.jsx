@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
 import styles from './HomeBlock.module.scss';
 
 import { Post } from '../components/Post';
@@ -19,7 +20,11 @@ export const HomePages = ({ filterTagvalue, setFilterTagvalue, tabsValue, setTab
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [usedQuery] = useSearchParams();
+
+  const [matchto, setMatchTo] = React.useState(usedQuery.get('matchto'));
+
   const usedPage = +usedQuery.get('page');
+  // setMatchTo(usedQuery.get('matchto')) ;
 
   // console.log(usedQuery.get('page'), usedQuery.get('pagesize'));
   // const usedPage = useSelector((state) => state.auth.data.page);
@@ -32,11 +37,11 @@ export const HomePages = ({ filterTagvalue, setFilterTagvalue, tabsValue, setTab
   const filterByTagName = useSelector((state) => state.filter.filter.value);
 
   React.useEffect(() => {
-    dispatch(fetchPage({ page: usedPage, pageSize }));
+    dispatch(fetchPage({ matchto, page: usedPage, pageSize }));
     dispatch(placeFilter(''));
     dispatch(fetchTags());
     dispatch(fetchComments());
-  }, [usedPage]);
+  }, [usedPage,matchto]);
 
   React.useEffect(() => {
     if (filterByTagName) {
@@ -54,15 +59,16 @@ export const HomePages = ({ filterTagvalue, setFilterTagvalue, tabsValue, setTab
     <>
       {filterTagvalue ? <h1>#{filterTagvalue}</h1> : ''}
       <Paper classes={{ root: styles.root }}>
+        
         <Typography variant="h6" classes={{ root: styles.title }}>
-          <Tabs style={{ marginBottom: 15 }} value={tabsValue} aria-label="basic tabs example">
+        <div className={styles.tabsBlockInline}>  <Tabs style={{ marginBottom: 15 }} value={tabsValue} aria-label="basic tabs example">
             <Tab
               disabled={Boolean(usedPage === 1)}
               label="Previous"
               onClick={() => {
                 setTabsValue(0);
                 dispatch(placeFilter(''));
-                navigate(`/pages?page=${usedPage - 1}&pagesize=${pageSize}`);
+                navigate(`/pages?matchto=${matchto}&page=${usedPage - 1}&pagesize=${pageSize}`);
               }}
             />
             <Tab
@@ -72,11 +78,23 @@ export const HomePages = ({ filterTagvalue, setFilterTagvalue, tabsValue, setTab
                 setTabsValue(1);
                 setFilterTagvalue('');
                 // dispatch(fetchSortByViews());
-                navigate(`/pages?page=${usedPage + 1}&pagesize=${pageSize}`);
+                navigate(`/pages?matchto=${matchto}&page=${usedPage + 1}&pagesize=${pageSize}`);
               }}
             />
-          </Tabs>
+
+          </Tabs><TextField
+              hiddenLabel
+              id="filled-hidden-label-small"
+              onChange={(e) => {
+                setMatchTo(e.target.value);
+                navigate(`/pages?matchto=${e.target.value}&page=${usedPage}&pagesize=${pageSize}`);
+              }}
+              value={matchto}
+              variant="filled"
+              size="small"
+            /></div>
         </Typography>
+        
       </Paper>
 
       <Grid container spacing={4}>

@@ -44,6 +44,51 @@ export const getAll = async (req, res) => {
     });
   }
 };
+export const getStringSearchPage = async (req, res) => {
+  // console.log(req.query);
+  const searchString = req.query.matchto;
+  const pageNumber = +req.query.page;
+  const pageSize = +req.query.pagesize;
+  console.log('searchString', searchString, 'pageNumber', pageNumber, 'pageSize', pageSize);
+
+  try {
+    const postCount = await PostModel.find().count();
+    //  console.log(postCount);
+
+    const posts = await PostModel.aggregate([
+      {
+        $match: { $or: [{ text: { $regex: searchString, $options: "i" } }, { title: { $regex: searchString, $options: "i"  } }] },
+      },
+      { $sort: { createdAt: -1 } },
+      {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'post',
+          as: 'comments',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'user_author',
+        },
+      },
+    ])
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+      .exec();
+    const data = { posts, count: postCount };
+    res.json(data);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Posts not found',
+    });
+  }
+};
 export const getPage = async (req, res) => {
   // console.log(req.query);
   const pageNumber = +req.query.page;
@@ -74,7 +119,7 @@ export const getPage = async (req, res) => {
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .exec();
-   const data = { posts, count: postCount };
+    const data = { posts, count: postCount };
     res.json(data);
   } catch (err) {
     console.log(err);

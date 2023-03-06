@@ -10,9 +10,10 @@ export const fetchTags = createAsyncThunk('posts/fetchTags', async () => {
   const { data } = await axios.get('/tags');
   return data;
 });
-export const fetchPage = createAsyncThunk('posts/fetchPage', async ({ page, pageSize }) => {
-  const { data } = await axios.get(`/pages?page=${page}&pagesize=${pageSize}`);
-  console.log("data", data);
+export const fetchPage = createAsyncThunk('posts/fetchPage', async ({matchto, page, pageSize }) => {
+  // console.log('matchto',matchto);
+  const { data } = await axios.get(`/pages?matchto=${matchto}&page=${page}&pagesize=${pageSize}`);
+  // console.log("data", data);
   return data;
 });
 export const fetchPostOnId = createAsyncThunk('posts/fetchOnePost', async (id) => {

@@ -55,7 +55,7 @@ export const Home = ({ filterTagvalue, setFilterTagvalue, tabsValue, setTabsValu
                 setFilterTagvalue('');
                 dispatch(placeFilter(''));
                 dispatch(fetchSortByCreation());
-                navigate(`/pages?page=1&pagesize=${pageSize}`);
+                navigate(`/pages?matchto=&page=1&pagesize=${pageSize}`);
               }}
             />
             <Tab
