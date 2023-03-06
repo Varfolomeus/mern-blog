@@ -52,12 +52,16 @@ export const getStringSearchPage = async (req, res) => {
   console.log('searchString', searchString, 'pageNumber', pageNumber, 'pageSize', pageSize);
 
   try {
-    const postCount = await PostModel.find().count();
+    const postCount = await PostModel.find({
+      $or: [{ text: { $regex: searchString, $options: 'i' } }, { title: { $regex: searchString, $options: 'i' } }],
+    }).count();
     //  console.log(postCount);
 
     const posts = await PostModel.aggregate([
       {
-        $match: { $or: [{ text: { $regex: searchString, $options: "i" } }, { title: { $regex: searchString, $options: "i"  } }] },
+        $match: {
+          $or: [{ text: { $regex: searchString, $options: 'i' } }, { title: { $regex: searchString, $options: 'i' } }],
+        },
       },
       { $sort: { createdAt: -1 } },
       {

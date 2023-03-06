@@ -41,7 +41,7 @@ export const HomePages = ({ filterTagvalue, setFilterTagvalue, tabsValue, setTab
     dispatch(placeFilter(''));
     dispatch(fetchTags());
     dispatch(fetchComments());
-  }, [usedPage,matchto]);
+  }, [usedPage, matchto]);
 
   React.useEffect(() => {
     if (filterByTagName) {
@@ -59,30 +59,30 @@ export const HomePages = ({ filterTagvalue, setFilterTagvalue, tabsValue, setTab
     <>
       {filterTagvalue ? <h1>#{filterTagvalue}</h1> : ''}
       <Paper classes={{ root: styles.root }}>
-        
         <Typography variant="h6" classes={{ root: styles.title }}>
-        <div className={styles.tabsBlockInline}>  <Tabs style={{ marginBottom: 15 }} value={tabsValue} aria-label="basic tabs example">
-            <Tab
-              disabled={Boolean(usedPage === 1)}
-              label="Previous"
-              onClick={() => {
-                setTabsValue(0);
-                dispatch(placeFilter(''));
-                navigate(`/pages?matchto=${matchto}&page=${usedPage - 1}&pagesize=${pageSize}`);
-              }}
-            />
-            <Tab
-              label="Next"
-              disabled={Boolean(usedPage * pageSize > postCount)}
-              onClick={() => {
-                setTabsValue(1);
-                setFilterTagvalue('');
-                // dispatch(fetchSortByViews());
-                navigate(`/pages?matchto=${matchto}&page=${usedPage + 1}&pagesize=${pageSize}`);
-              }}
-            />
-
-          </Tabs><TextField
+          <div className={styles.tabsBlockInline}>
+            <Tabs style={{ marginBottom: 15 }} value={tabsValue} aria-label="basic tabs example">
+              <Tab
+                disabled={Boolean(usedPage === 1)}
+                label="Previous"
+                onClick={() => {
+                  setTabsValue(0);
+                  dispatch(placeFilter(''));
+                  navigate(`/pages?matchto=${matchto}&page=${usedPage - 1}&pagesize=${pageSize}`);
+                }}
+              />
+              <Tab
+                label="Next"
+                disabled={Boolean(usedPage * pageSize > postCount)}
+                onClick={() => {
+                  setTabsValue(1);
+                  setFilterTagvalue('');
+                  // dispatch(fetchSortByViews());
+                  navigate(`/pages?matchto=${matchto}&page=${usedPage + 1}&pagesize=${pageSize}`);
+                }}
+              />
+            </Tabs>
+            <TextField
               hiddenLabel
               id="filled-hidden-label-small"
               onChange={(e) => {
@@ -92,9 +92,9 @@ export const HomePages = ({ filterTagvalue, setFilterTagvalue, tabsValue, setTab
               value={matchto}
               variant="filled"
               size="small"
-            /></div>
+            />
+          </div>
         </Typography>
-        
       </Paper>
 
       <Grid container spacing={4}>
