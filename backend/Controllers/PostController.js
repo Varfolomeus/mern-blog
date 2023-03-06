@@ -152,7 +152,7 @@ export const getSortedByCreation = async (req, res) => {
           as: 'user_author',
         },
       },
-    ]).skipexec();
+    ]).exec();
 
     res.json(posts);
   } catch (err) {
