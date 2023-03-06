@@ -49,7 +49,7 @@ export const getStringSearchPage = async (req, res) => {
   const searchString = req.query.matchto;
   const pageNumber = +req.query.page;
   const pageSize = +req.query.pagesize;
-  console.log('searchString', searchString, 'pageNumber', pageNumber, 'pageSize', pageSize);
+  // console.log('searchString', searchString, 'pageNumber', pageNumber, 'pageSize', pageSize);
 
   try {
     const postCount = await PostModel.find({
